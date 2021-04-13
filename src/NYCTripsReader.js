@@ -6,8 +6,13 @@ export default function NYCDataReader(isGroup, swPosition, nePosition, positionT
               lat_offset : nePosition.lat - swPosition.lat,
               lng_offset : nePosition.lng - swPosition.lng
           };
-          var params = startPosition.lng + "/" + offset.lng_offset + "/" + startPosition.lat + "/" + offset.lat_offset + "/" + positionType;
-          var url = isGroup? `${process.env.REACT_APP_API_URL}/TaxiTrips/groups/` +  params : `${process.env.REACT_APP_API_URL}/TaxiTrips/` + params;
+
+          var params = `${startPosition.lng}/${offset.lng_offset}/${startPosition.lat}/${offset.lat_offset}/${positionType}`;
+
+          var url = isGroup? 
+                    `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_TRIPGROUPS_API}${params}`: 
+                    `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_TRIPS_API}${params}`;
+
           return fetch(url,
                {
                    method:"get",
