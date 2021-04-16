@@ -13,6 +13,9 @@ export default function NYCDataReader(isGroup, swPosition, nePosition, positionT
                     `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_TRIPGROUPS_API}${params}`: 
                     `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_TRIPS_API}${params}`;
 
+        alert(url);
+        console.log(url);
+
           return fetch(url,
                {
                    method:"get",

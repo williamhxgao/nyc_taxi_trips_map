@@ -2,23 +2,12 @@ import React, {useState} from "react";
 import { GoogleMap, withScriptjs, withGoogleMap, Marker, InfoWindow } from "react-google-maps";
 import NYCTripsReader from "./NYCTripsReader";
 
-const triptype_pickup = "PickUp";
-const triptyp_dropoff = "DropOff";
-
 function Map(){
 
   let map = null; 
-  
-  const dataFetch = NYCTripsReader;
 
   
-  const reloadMarkers = map => {
-    console.log("m: " + map);
-    var sw = {lat: map.getBounds().getSouthWest().lat(),lng: map.getBounds().getSouthWest().lng()};
-    var ne = {lat: map.getBounds().getNorthEast().lat(),lng: map.getBounds().getNorthEast().lng()}; 
-    setIsGroup(map.getZoom() < 20)
-    dataFetch(isGroup, sw, ne, triptype_pickup).then(data => setData(data));
-  }
+  const dataFetch = NYCTripsReader;
 
   const [isGroup, setIsGroup] = useState(true);
   
@@ -26,13 +15,40 @@ function Map(){
 
   const [selectedMark, setSelectedMark] = useState(null);
 
+  const [tripType, setTripType] = useState("PickUp");
+  
+  const reloadMarkers = map => {
+
+    var sw = {lat: map.getBounds().getSouthWest().lat(),lng: map.getBounds().getSouthWest().lng()};
+    var ne = {lat: map.getBounds().getNorthEast().lat(),lng: map.getBounds().getNorthEast().lng()}; 
+    setIsGroup(map.getZoom() < 20)
+    dataFetch(isGroup, sw, ne, tripType).then(data => setData(data));
+  }
+
+  const clearMarkers = () => {
+    setSelectedMark(null);
+    setData([]);
+  }
 
   return(
-    <GoogleMap 
+    <div>
+      <div>
+        <label>
+            <input type="radio" value="PickUp" checked={tripType === 'PickUp'} onClick={() => {setTripType('PickUp')}} />
+            Pick Up
+        </label>
+        <label>
+            <input type="radio" value="DropOff" checked={tripType === 'DropOff'} onClick={() => {setTripType('DropOff')}} />
+            Drop Off
+        </label>
+      </div>
+      <GoogleMap 
       ref={m => map = m}
       defaultZoom={Number(process.env.REACT_APP_DEFAULT_ZOOM)} 
       defaultCenter={{lat:Number(process.env.REACT_APP_DEFAULT_LAT), lng:Number(process.env.REACT_APP_DEFAULT_LNG)}} 
-      onTilesLoaded={() => {alert(map.getZoom()); reloadMarkers(map);}}
+      onTilesLoaded={() => reloadMarkers(map)}
+      onZoomChanged={clearMarkers}
+      onDragEnd={clearMarkers}
     >  
       { isGroup?
         data.map(element =>{
@@ -106,6 +122,7 @@ function Map(){
           </InfoWindow>
         )}
     </GoogleMap>
+    </div>
   );
 
   
@@ -116,13 +133,15 @@ const WrappedMap = withScriptjs(withGoogleMap(Map));
 export default function App() {
   
   return (
-    <div style={{width: '100vw', height: '100vh'}}>
-      <WrappedMap 
-        googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-        loadingElement={<div style={{height:"100%"}}/>} 
-        containerElement={<div style={{height:"100%"}}/>} 
-        mapElement={<div style={{height:"100%"}}/>} 
-      />
+    <div>
+      <div style={{width: '100vw', height: '90vh'}}>
+        <WrappedMap 
+          googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`}
+          loadingElement={<div style={{height:"100%"}}/>} 
+          containerElement={<div style={{height:"100%"}}/>} 
+          mapElement={<div style={{height:"100%"}}/>} 
+        />
+      </div>
     </div>
   );
   
